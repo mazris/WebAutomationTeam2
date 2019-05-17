@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class CommonAPI {
-    public static final String BROWSERSTACK_USERNAME = "";
-    public static final String BROWSERSTACK_AUTOMATE_KEY = "";
+    public static final String BROWSERSTACK_USERNAME = "soniamazri1";
+    public static final String BROWSERSTACK_AUTOMATE_KEY = "tX959y2CsYEUVujsuGsM";
     public static final String SAUCE_USERNAME = "";
     public static final String SAUCE_AUTOMATE_KEY = "";
     public static final String BROWSERSTACK_URL = "https://" + BROWSERSTACK_USERNAME + ":" + BROWSERSTACK_AUTOMATE_KEY + "@hub-cloud.browserstack.com/wd/hub";
@@ -61,32 +61,32 @@ public class CommonAPI {
 
     }
 
-    @Parameters({"platform", "url", "browser", "cloud", "browserVersion", "envName"})
+    @Parameters({"platform", "url", "browserName", "useCloudEnv", "browserVersion", "cloudEnvName"})
     @BeforeMethod
-    public static WebDriver setupDriver(String platform, String url, @Optional("chrome") String browser, @Optional("false") boolean cloud, String browserVersion, String envName) throws MalformedURLException {
-        if (cloud) {
-            driver = getCloudDriver(browser, browserVersion, platform, envName);
+    public static WebDriver setupDriver(String platform, String url, @Optional("chrome") String browserName,  boolean useCloudEnv, String browserVersion, String cloudEnvName) throws MalformedURLException {
+        if (useCloudEnv) {
+            driver = getCloudDriver(browserName, browserVersion, platform, cloudEnvName);
         } else {
-            driver = getLocalDriver(browser, platform);
+            driver = getLocalDriver(browserName, platform);
         }
         driver.get(url);
         return driver;
     }
 
-    public static WebDriver getCloudDriver(String browser, String browserVersion, String platform, String envName) throws MalformedURLException {
+    public static WebDriver getCloudDriver(String browserName, String browserVersion, String platform, String cloudEnvName) throws MalformedURLException {
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("name", "Cloud Execution");
-        capabilities.setCapability("browser", browser);
+        capabilities.setCapability("browser", browserName);
 
         capabilities.setCapability("browser_version", browserVersion);
         capabilities.setCapability("os", platform);
         capabilities.setCapability("os_version", "Mojave");
 
-        if (envName.equalsIgnoreCase("Saucelabs")) {
+        if (cloudEnvName.equalsIgnoreCase("Saucelabs")) {
             //resolution for Saucelabs
             driver = new RemoteWebDriver(new URL(SAUCE_URL), capabilities);
-        } else if (envName.equalsIgnoreCase("Browserstack")) {
+        } else if (cloudEnvName.equalsIgnoreCase("Browserstack")) {
             capabilities.setCapability("resolution", "1024x768");
             driver = new RemoteWebDriver(new URL(BROWSERSTACK_URL), capabilities);
         }
@@ -96,15 +96,15 @@ public class CommonAPI {
     /**
      * This method create driver instance for the local execution
      *
-     * @param browser  name of the browser
+     * @param browserName  name of the browser
      * @param platform platform name
      * @return WebDriver webdriver instance for the driver
      * @Author - peoplenTech
      */
-    public static WebDriver getLocalDriver(String browser, String platform) {
-        if (platform.equalsIgnoreCase("mac") && browser.equalsIgnoreCase("chrome")) {
+    public static WebDriver getLocalDriver(String browserName, String platform) {
+        if (platform.equalsIgnoreCase("mac") && browserName.equalsIgnoreCase("chrome")) {
             System.setProperty("webdriver.chrome.driver", "../Generic/src/main/resources/drivers/chromedriver");
-        } else if (platform.equalsIgnoreCase("windows") && browser.equalsIgnoreCase("chrome")) {
+        } else if (platform.equalsIgnoreCase("windows") && browserName.equalsIgnoreCase("chrome")) {
             System.setProperty("webdriver.chrome.driver", "../Generic/src/main/resources/drivers/chromedriver.exe");
         }
         driver = new ChromeDriver();
